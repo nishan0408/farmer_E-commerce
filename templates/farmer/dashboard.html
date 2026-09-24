@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Dashboard - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-brand">🌾 Farmer</div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('main.farmer_dashboard', tab='dashboard') }}" class="{{ 'active' if active_tab == 'dashboard' else '' }}">Dashboard</a></li>
+            <li><a href="{{ url_for('main.farmer_dashboard', tab='products') }}" class="{{ 'active' if active_tab == 'products' else '' }}">My Products</a></li>
+            <li><a href="{{ url_for('main.farmer_dashboard', tab='orders') }}" class="{{ 'active' if active_tab == 'orders' else '' }}">Orders Received</a></li>
+            <li><a href="{{ url_for('main.farmer_dashboard', tab='finished_orders') }}" class="{{ 'active' if active_tab == 'finished_orders' else '' }}">Orders Finished</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        </ul>
+    </aside>
+    
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Welcome, {{ user.first_name or user.email }}!</h1>
+                <p class="text-muted">👨‍🌾 Farmer Dashboard</p>
+            </div>
+            <div class="user-info">
+                <div>
+                    <strong>{{ user.email }}</strong><br>
+                    <small>{{ user.farm_name }}</small>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+        
+        {% if active_tab == 'dashboard' %}
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">📦 Total Products</h3>
+                    <p style="font-size: 2rem; font-weight: bold;">{{ products|length }}</p>
+                    <small class="text-muted">Products listed for sale</small>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--info-color); margin-bottom: 0.5rem;">📊 Orders Received</h3>
+                    <p style="font-size: 2rem; font-weight: bold;">0</p>
+                    <small class="text-muted">Orders from buyers</small>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">📝 My Information</div>
+                <div class="card-body">
+                    <p><strong>Farmer Name:</strong> {{ user.first_name or 'Not provided' }} {{ user.last_name or '' }}</p>
+                    <p><strong>Farm Name:</strong> {{ user.farm_name or 'Not provided' }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.phone_number }}</p>
+                    <p><strong>Location:</strong> {{ user.city or 'Not provided' }}, {{ user.state or 'N/A' }}</p>
+                    <p><strong>Account Status:</strong> <span style="color: var(--primary-color);">✓ Active</span></p>
+                </div>
+            </div>
+        {% elif active_tab == 'products' %}
+            <div class="card" id="add-product">
+                <div class="card-header">➕ Add New Product</div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.add_farmer_product') }}" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Product Name *</label>
+                            <input type="text" id="name" name="name" placeholder="Example: Fresh Tomatoes" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Product Description *</label>
+                            <textarea id="description" name="description" placeholder="Describe your product quality, freshness, harvest date, etc." required></textarea>
+                        </div>
+
+                        <div class="grid grid-2" style="gap: 1rem;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="price">Price Amount *</label>
+                                <input type="number" id="price" name="price" min="1" step="0.01" placeholder="0.00" required>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="currency">Price Currency *</label>
+                                <select id="currency" name="currency" required>
+                                    <option value="INR" selected>INR - Indian Rupee</option>
+                                    <option value="USD">USD - US Dollar</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - British Pound</option>
+                                    <option value="NPR">NPR - Nepalese Rupee</option>
+                                    <option value="AUD">AUD - Australian Dollar</option>
+                                    <option value="CAD">CAD - Canadian Dollar</option>
+                                    <option value="JPY">JPY - Japanese Yen</option>
+                                    <option value="AED">AED - UAE Dirham</option>
+                                    <option value="SGD">SGD - Singapore Dollar</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="quality">Quality *</label>
+                                <select id="quality" name="quality" required>
+                                    <option value="">Select quality</option>
+                                    <option value="average">Average</option>
+                                    <option value="good">Good</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label for="image">Product Image *</label>
+                            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+                            <small class="text-muted">Allowed: JPG, JPEG, PNG, WEBP</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Product</button>
+                    </form>
+                    <p class="text-muted" style="margin-top: 0.75rem;">Note: Prices are stored in INR and displayed in multiple currencies using reference conversion rates.</p>
+                </div>
+            </div>
+
+            <div class="card" id="products">
+                <div class="card-header">🧺 My Products</div>
+                <div class="card-body">
+                    {% if products %}
+                        <div class="products-grid">
+                            {% for product in products %}
+                                <article class="product-card">
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/products/' ~ product.image_filename) }}"
+                                        alt="{{ product.name }}"
+                                        class="product-image"
+                                    >
+                                    <div class="product-content">
+                                        <h3 class="product-title">{{ product.name }}</h3>
+                                        <p class="product-desc">{{ product.description }}</p>
+                                        <p class="product-price">INR {{ '%.2f'|format(product.price) }}</p>
+                                        <div class="currency-list">
+                                            {% for code in display_currencies %}
+                                                {% set converted = product.price * currency_rates[code] %}
+                                                <span class="currency-chip">{{ code }} {{ '%.2f'|format(converted) }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        <p class="product-meta">
+                                            <span class="quality-pill quality-{{ product.quality|lower }}">{{ product.quality|title }}</span>
+                                            <span>Added: {{ product.created_at.strftime('%d %b %Y') }}</span>
+                                        </p>
+                                        <form method="POST" action="{{ url_for('main.delete_farmer_product', product_id=product.id) }}" style="margin-top: 0.75rem;">
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this product?');">Delete Product</button>
+                                        </form>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No products added yet. Use "Add New Product" to list your first product.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% elif active_tab == 'orders' %}
+            <div class="card" id="orders">
+                <div class="card-header">📊 Orders Received</div>
+                <div class="card-body">
+                    <p class="text-muted">No orders received yet.</p>
+                </div>
+            </div>
+        {% elif active_tab == 'finished_orders' %}
+            <div class="card" id="finished-orders">
+                <div class="card-header">✅ Orders Finished</div>
+                <div class="card-body">
+                    {% if completed_orders %}
+                        <div class="table-wrap">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Product</th>
+                                        <th>Buyer</th>
+                                        <th>Qty</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                        <th>Completed On</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in completed_orders %}
+                                        <tr>
+                                            <td>#{{ order.id }}</td>
+                                            <td>{{ order.product.name if order.product else 'N/A' }}</td>
+                                            <td>{{ order.buyer.first_name if order.buyer and order.buyer.first_name else (order.buyer.email if order.buyer else 'N/A') }}</td>
+                                            <td>{{ order.quantity }}</td>
+                                            <td>{{ order.currency }} {{ '%.2f'|format(order.unit_price) }}</td>
+                                            <td>{{ order.currency }} {{ '%.2f'|format(order.total_price) }}</td>
+                                            <td>{{ order.completed_at.strftime('%d %b %Y, %H:%M') if order.completed_at else (order.created_at.strftime('%d %b %Y, %H:%M') if order.created_at else 'N/A') }}</td>
+                                            <td><span class="quality-pill quality-premium">Completed</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No completed orders yet. Finished orders will appear here with full details.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

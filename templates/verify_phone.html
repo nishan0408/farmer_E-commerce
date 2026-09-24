@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Verify OTP - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <h1>📧 Verify Your Account</h1>
+            <p>We'll send an OTP to your email</p>
+        </div>
+        
+        <form method="POST" id="phone-verify-form">
+            <div class="alert alert-info">
+                <strong>📧 Email:</strong> {{ email }}
+                <br>
+                <small>We'll send an OTP code to this email address</small>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Send OTP Code</button>
+        </form>
+        
+        <div class="auth-link">
+            <p><a href="{{ url_for('auth.login_choice') }}">Back to login choice</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Farmer Login - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <h1>👨‍🌾 Farmer Login</h1>
+            <p>Sign in to your account</p>
+        </div>
+        
+        <form method="POST" id="login-form">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" 
+                       value="{{ email or '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="remember" value="on">
+                    Remember me
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        
+        <div class="auth-link">
+            <p>Don't have an account? <a href="{{ url_for('auth.register_account') }}">Register once for all dashboards</a></p>
+            <p><a href="{{ url_for('auth.login_choice') }}">Back to login choice</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

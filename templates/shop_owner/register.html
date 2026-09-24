@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Shop Owner Registration - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 600px;">
+        <div class="auth-card-header">
+            <h1>🏪 Shop Owner Registration</h1>
+            <p>Create your shop account</p>
+        </div>
+        
+        <form method="POST" id="register-form">
+            <!-- Personal Information -->
+            <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #ecf0f1;">
+                <h4 style="color: #2c3e50; margin-bottom: 1rem;">👤 Personal Information</h4>
+                
+                <div class="form-group">
+                    <label for="first_name">First Name *</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" 
+                           value="{{ first_name or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" 
+                           value="{{ last_name or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           value="{{ email or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="text" id="phone" name="phone" class="form-control" 
+                           placeholder="+1 (555) 123-4567" value="{{ phone or '' }}" required>
+                </div>
+            </div>
+            
+            <!-- Shop Information -->
+            <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #ecf0f1;">
+                <h4 style="color: #2c3e50; margin-bottom: 1rem;">🏪 Shop Information</h4>
+                
+                <div class="form-group">
+                    <label for="shop_name">Shop Name *</label>
+                    <input type="text" id="shop_name" name="shop_name" class="form-control" 
+                           placeholder="e.g., Fresh Grocery Store" value="{{ shop_name or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shop_category">Shop Category *</label>
+                    <select id="shop_category" name="shop_category" class="form-control" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="grocery" {% if shop_category == 'grocery' %}selected{% endif %}>🛒 Grocery</option>
+                        <option value="electronics" {% if shop_category == 'electronics' %}selected{% endif %}>📱 Electronics</option>
+                        <option value="clothing" {% if shop_category == 'clothing' %}selected{% endif %}>👕 Clothing</option>
+                        <option value="pharmacy" {% if shop_category == 'pharmacy' %}selected{% endif %}>💊 Pharmacy</option>
+                        <option value="hardware" {% if shop_category == 'hardware' %}selected{% endif %}>🔨 Hardware</option>
+                        <option value="general" {% if shop_category == 'general' %}selected{% endif %}>🏬 General Store</option>
+                        <option value="other" {% if shop_category == 'other' %}selected{% endif %}>📦 Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shop_description">Shop Description</label>
+                    <textarea id="shop_description" name="shop_description" class="form-control" 
+                              placeholder="Brief description of your shop (optional)">{{ shop_description or '' }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shop_license_number">Shop License Number *</label>
+                    <input type="text" id="shop_license_number" name="shop_license_number" class="form-control" 
+                           placeholder="e.g., SL-2024-001" value="{{ shop_license_number or '' }}" required>
+                    <small class="text-muted">Your shop's official license number</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shop_registration_number">Shop Registration Number *</label>
+                    <input type="text" id="shop_registration_number" name="shop_registration_number" class="form-control" 
+                           placeholder="e.g., SR-2024-001" value="{{ shop_registration_number or '' }}" required>
+                    <small class="text-muted">Your shop's registration number</small>
+                </div>
+            </div>
+            
+            <!-- Security Information -->
+            <div>
+                <h4 style="color: #2c3e50; margin-bottom: 1rem;">🔒 Security Information</h4>
+                
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" class="form-control" 
+                           placeholder="At least 6 characters" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password_confirm">Confirm Password *</label>
+                    <input type="password" id="password_confirm" name="password_confirm" class="form-control" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Register Shop</button>
+        </form>
+        
+        <div class="auth-link">
+            <p>Already have an account? <a href="{{ url_for('auth.login', user_type='shop_owner') }}">Login here</a></p>
+            <p><a href="{{ url_for('auth.login_choice') }}">Back to login choice</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

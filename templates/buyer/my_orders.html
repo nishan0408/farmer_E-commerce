@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<style>
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.sidebar {
+    width: 230px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 0 20px 20px 20px;
+    border-bottom: 2px solid #34495e;
+    margin-bottom: 20px;
+    color: #1abc9c;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 0;
+}
+
+.sidebar-menu a {
+    display: block;
+    padding: 12px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-menu a:hover {
+    background-color: #34495e;
+    border-left-color: #1abc9c;
+    color: #1abc9c;
+}
+
+.sidebar-menu a.active {
+    background-color: #1abc9c;
+    color: white;
+    border-left-color: #1abc9c;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 230px;
+    padding: 25px;
+}
+
+.header {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+}
+
+.header .text-muted {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.orders-table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #eee;
+}
+
+.orders-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+}
+
+.orders-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: #666;
+}
+
+.orders-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-accepted {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-shipped {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.status-completed {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.order-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.order-id {
+    font-weight: bold;
+    color: #1abc9c;
+}
+
+.order-date {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.order-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.order-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: #1abc9c;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #16a085;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.no-orders-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .orders-table {
+        font-size: 0.9rem;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 10px;
+    }
+
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-brand">👤 Buyer</div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('main.buyer_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('main.buyer_browse_products') }}">Browse Products</a></li>
+            <li><a href="{{ url_for('main.buyer_my_orders') }}" class="active">My Orders</a></li>
+            <li><a href="{{ url_for('main.buyer_wishlist') }}">Wishlist</a></li>
+            <li><a href="{{ url_for('main.buyer_profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        </ul>
+    </aside>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>📦 My Orders</h1>
+            <p class="text-muted">View all your orders from farmers and shops</p>
+        </div>
+        
+        <!-- Display flash messages if any -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">Order #{{ order.id }}</div>
+                                <div class="order-date">{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                            </div>
+                            <span class="status-badge status-{{ order.status }}">
+                                {% if order.status == 'pending' %}⏳ Pending
+                                {% elif order.status == 'accepted' %}✓ Accepted
+                                {% elif order.status == 'shipped' %}🚚 Shipped
+                                {% elif order.status == 'completed' %}✓ Completed
+                                {% elif order.status == 'cancelled' %}✗ Cancelled
+                                {% else %}{{ order.status|title }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Product</div>
+                                <div class="detail-value">{{ order.product.name }}</div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">Seller</div>
+                                <div class="detail-value">{{ order.farmer.first_name or order.farmer.farm_name or 'Farmer' }}</div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">Quantity</div>
+                                <div class="detail-value">{{ order.quantity }} unit(s)</div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">Unit Price</div>
+                                <div class="detail-value">₹{{ "%.2f"|format(order.unit_price) }}</div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">Total Price</div>
+                                <div class="detail-value" style="font-weight: bold; color: var(--primary-color);">
+                                    ₹{{ "%.2f"|format(order.total_price) }}
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">Delivery Address</div>
+                                <div class="detail-value">{{ order.shipping_address or 'Not provided' }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-actions">
+                            {% if order.status == 'completed' %}
+                                <button class="btn btn-secondary" onclick="alert('Review feature coming soon!')">
+                                    ⭐ Leave Review
+                                </button>
+                            {% endif %}
+                            
+                            {% if order.status in ['pending', 'accepted'] %}
+                                <button class="btn btn-secondary" onclick="alert('Cancel feature coming soon!')">
+                                    ✗ Cancel Order
+                                </button>
+                            {% endif %}
+                            
+                            <a href="{{ url_for('main.buyer_browse_products') }}" class="btn btn-primary">
+                                🛍️ Shop More
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-orders">
+                <div class="no-orders-icon">📭</div>
+                <h2>No orders yet</h2>
+                <p>Start shopping to see your orders here!</p>
+                <a href="{{ url_for('main.buyer_browse_products') }}" class="btn btn-primary" style="margin-top: 20px;">
+                    🛍️ Browse Products
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

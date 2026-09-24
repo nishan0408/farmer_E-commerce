@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Login - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="split-login-page">
+    <section class="split-login-visual" aria-label="Platform details">
+        <div class="visual-overlay"></div>
+        <div class="visual-content">
+            <span class="visual-badge">Farmer E-Commerce Platform</span>
+            <h1>Welcome to AgriConnect</h1>
+            <p>One platform for farmers, buyers, and shop owners to trade with trust and speed.</p>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <h3>Farmer Tools</h3>
+                    <p>List products, track inventory, and manage orders in one place.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Buyer Access</h3>
+                    <p>Find fresh products quickly and buy directly from verified sellers.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Shop Owner Hub</h3>
+                    <p>Source in bulk, compare suppliers, and monitor fulfillment status.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Secure Sign-in</h3>
+                    <p>Role-based login with email and phone verification for safety.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="split-login-panel" aria-label="Login panel">
+        <div class="split-login-card">
+            <div class="login-brand">
+                <h2 id="role-heading">Farmer Login</h2>
+                <p>Switch role below and sign in with your account</p>
+            </div>
+
+            <div class="role-switch" role="tablist" aria-label="Select account type">
+                <button type="button" class="role-tab active" data-role="farmer" aria-selected="true">Farmer</button>
+                <button type="button" class="role-tab" data-role="buyer" aria-selected="false">Buyer</button>
+                <button type="button" class="role-tab" data-role="shop_owner" aria-selected="false">Shop Owner</button>
+            </div>
+
+            <form id="role-login-form" method="POST" action="{{ url_for('auth.login', user_type='farmer') }}">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ email or '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="role-meta-row">
+                    <label class="remember-label" for="remember-me">
+                        <input id="remember-me" type="checkbox" name="remember" value="on" {% if remember %}checked{% endif %}>
+                        Remember me
+                    </label>
+                </div>
+
+                <button id="login-submit" type="submit" class="btn btn-primary btn-block">Login as Farmer</button>
+            </form>
+
+            <div class="auth-link role-link-group">
+                <p>Don't have an account? <a id="register-link" href="{{ url_for('auth.register', user_type='farmer') }}">Register as Farmer</a></p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const roleTitles = {
+            farmer: 'Farmer',
+            buyer: 'Buyer',
+            shop_owner: 'Shop Owner'
+        };
+
+        const loginUrls = {
+            farmer: "{{ url_for('auth.login', user_type='farmer') }}",
+            buyer: "{{ url_for('auth.login', user_type='buyer') }}",
+            shop_owner: "{{ url_for('auth.login', user_type='shop_owner') }}"
+        };
+
+        const registerUrls = {
+            farmer: "{{ url_for('auth.register', user_type='farmer') }}",
+            buyer: "{{ url_for('auth.register', user_type='buyer') }}",
+            shop_owner: "{{ url_for('auth.register', user_type='shop_owner') }}"
+        };
+
+        const tabs = document.querySelectorAll('.role-tab');
+        const form = document.getElementById('role-login-form');
+        const heading = document.getElementById('role-heading');
+        const button = document.getElementById('login-submit');
+        const registerLink = document.getElementById('register-link');
+
+        if (!tabs.length || !form || !heading || !button || !registerLink) {
+            return;
+        }
+
+        function setActiveRole(role) {
+            tabs.forEach((tab) => {
+                const isActive = tab.dataset.role === role;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+
+            form.action = loginUrls[role];
+            heading.textContent = roleTitles[role] + ' Login';
+            button.textContent = 'Login as ' + roleTitles[role];
+            registerLink.textContent = 'Register as ' + roleTitles[role];
+            registerLink.href = registerUrls[role];
+        }
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', function () {
+                setActiveRole(this.dataset.role);
+            });
+        });
+
+        const requestedRole = "{{ active_role|default('farmer') }}";
+        const initialRole = roleTitles[requestedRole] ? requestedRole : 'farmer';
+        setActiveRole(initialRole);
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Buyer Registration - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 500px;">
+        <div class="auth-card-header">
+            <h1>👤 Buyer Registration</h1>
+            <p>Create your account</p>
+        </div>
+        
+        <form method="POST" id="register-form">
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" 
+                       value="{{ first_name or '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" 
+                       value="{{ last_name or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control" 
+                       value="{{ email or '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="text" id="phone" name="phone" class="form-control" 
+                       placeholder="+1 (555) 123-4567" value="{{ phone or '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" class="form-control" 
+                       placeholder="At least 6 characters" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password_confirm">Confirm Password *</label>
+                <input type="password" id="password_confirm" name="password_confirm" class="form-control" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+        
+        <div class="auth-link">
+            <p>Already have an account? <a href="{{ url_for('auth.login', user_type='buyer') }}">Login here</a></p>
+            <p><a href="{{ url_for('auth.login_choice') }}">Back to login choice</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

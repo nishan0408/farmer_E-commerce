@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Create Account - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 560px;">
+        <div class="auth-card-header">
+            <h1>📝 Create One Account</h1>
+            <p>Verify once with OTP, then login as Farmer, Buyer, or Shop Owner</p>
+        </div>
+
+        <form method="POST" id="unified-register-form">
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" value="{{ first_name or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" value="{{ last_name or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="farm_name">Farm Name (Optional)</label>
+                <input type="text" id="farm_name" name="farm_name" class="form-control" value="{{ farm_name or '' }}" placeholder="You can update this later">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ email or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="text" id="phone" name="phone" class="form-control" value="{{ phone or '' }}" placeholder="+91... / +977..." required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm">Confirm Password *</label>
+                <input type="password" id="password_confirm" name="password_confirm" class="form-control" required>
+            </div>
+
+            <div class="alert alert-info" style="margin-bottom: 1rem;">
+                This creates one account for all dashboards (Farmer, Buyer, Shop Owner). OTP verification is needed only this first time.
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Create Account & Verify OTP</button>
+        </form>
+
+        <div class="auth-link">
+            <p>Already registered and verified? <a href="{{ url_for('auth.login_choice') }}">Login here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

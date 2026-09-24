@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+
+{% block title %}Verify OTP - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <h1>🔐 Verify Your Account</h1>
+            <p>Enter the OTP sent to your email or phone to complete registration</p>
+        </div>
+        
+        <form method="POST" id="otp-verify-form">
+            <div class="form-group">
+                <label for="otp">One-Time Password (OTP) *</label>
+                <input type="text" id="otp" name="otp" class="form-control" 
+                       placeholder="000000" maxlength="6" pattern="[0-9]{6}" required
+                       style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: bold;">
+                <small style="display: block; margin-top: 0.5rem; color: #7f8c8d;">
+                    ⏱️ Code valid for 10 minutes
+                </small>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Verify & Complete Registration</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 0.5rem;">Didn't receive the code?</p>
+            <form method="POST" action="{{ url_for('auth.phone_verification_page', email=user_email) }}" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Resend OTP</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

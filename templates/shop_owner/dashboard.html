@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Shop Owner Dashboard - Farmer E-Commerce{% endblock %}
+
+{% block content %}
+<style>
+.shop-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.shop-product-card {
+    border: 1px solid #ecf0f1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.shop-product-image {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    background: #f7f9fb;
+}
+
+.shop-product-content {
+    padding: 0.9rem;
+}
+
+.quality-pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: #ecf0f1;
+}
+
+.quality-average { background: #f4f4f4; color: #666; }
+.quality-good { background: #e8f8f2; color: #1f7a55; }
+.quality-premium { background: #fff3cd; color: #8a6d3b; }
+</style>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-brand">🏪 Shop Owner</div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('main.shop_owner_dashboard') }}" class="active">Dashboard</a></li>
+            <li><a href="#inventory">Inventory</a></li>
+            <li><a href="#orders">Orders</a></li>
+            <li><a href="#sales">Sales Report</a></li>
+            <li><a href="#profile">Shop Profile</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        </ul>
+    </aside>
+    
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Welcome, {{ user.first_name or user.email }}!</h1>
+                <p class="text-muted">🏪 Shop Owner Dashboard</p>
+            </div>
+            <div class="user-info">
+                <div>
+                    <strong>{{ user.shop_name }}</strong><br>
+                    <small>{{ user.email }}</small>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">📦 Total Items</h3>
+                <p style="font-size: 2rem; font-weight: bold;">{{ own_products|length }}</p>
+                <small class="text-muted">Products in your shop inventory</small>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--info-color); margin-bottom: 0.5rem;">🌐 Marketplace Products</h3>
+                <p style="font-size: 2rem; font-weight: bold;">{{ products|length }}</p>
+                <small class="text-muted">Visible to buyers and shop owners</small>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--warning-color); margin-bottom: 0.5rem;">💰 Daily Revenue</h3>
+                <p style="font-size: 2rem; font-weight: bold;">$0</p>
+                <small class="text-muted">Today's earnings</small>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--secondary-color); margin-bottom: 0.5rem;">⭐ Rating</h3>
+                <p style="font-size: 2rem; font-weight: bold;">—</p>
+                <small class="text-muted">Customer satisfaction</small>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">🏪 Shop Information</div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <p><strong>Shop Name:</strong> {{ user.shop_name or 'Not provided' }}</p>
+                        <p><strong>Category:</strong> 
+                            {% if user.shop_category == 'grocery' %}
+                                🛒 Grocery
+                            {% elif user.shop_category == 'electronics' %}
+                                📱 Electronics
+                            {% elif user.shop_category == 'clothing' %}
+                                👕 Clothing
+                            {% elif user.shop_category == 'pharmacy' %}
+                                💊 Pharmacy
+                            {% elif user.shop_category == 'hardware' %}
+                                🔨 Hardware
+                            {% elif user.shop_category == 'general' %}
+                                🏬 General Store
+                            {% else %}
+                                📦 {{ user.shop_category|title }}
+                            {% endif %}
+                        </p>
+                        <p><strong>License #:</strong> {{ user.shop_license_number or 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Phone:</strong> {{ user.phone_number }}</p>
+                        <p><strong>Registration #:</strong> {{ user.shop_registration_number or 'N/A' }}</p>
+                    </div>
+                </div>
+                {% if user.shop_description %}
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #ecf0f1;">
+                        <p><strong>Description:</strong></p>
+                        <p>{{ user.shop_description }}</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="#edit-profile" class="btn btn-secondary">Edit Shop Details</a>
+            </div>
+        </div>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-header">📊 Quick Stats</div>
+                <div class="card-body">
+                    <p><strong>Account Status:</strong> <span style="color: var(--primary-color);">✓ Active</span></p>
+                    <p><strong>Email Verified:</strong> <span style="color: var(--primary-color);">✓ Yes</span></p>
+                    <p><strong>Phone Verified:</strong> <span style="color: var(--primary-color);">✓ Yes</span></p>
+                    <p><strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">📈 Performance</div>
+                <div class="card-body">
+                    <p><strong>Total Sales:</strong> $0</p>
+                    <p><strong>Total Orders:</strong> 0</p>
+                    <p><strong>Avg Order Value:</strong> $0</p>
+                    <p><strong>Success Rate:</strong> 0%</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">🚀 Quick Actions</div>
+            <div class="card-body">
+                <p style="margin-bottom: 1rem;">Manage your shared marketplace products:</p>
+                <a href="#add-product" class="btn btn-primary">+ Add Product</a>
+                <a href="#my-products" class="btn btn-secondary" style="margin-left: 0.5rem;">📦 My Products</a>
+                <a href="#all-products" class="btn btn-secondary" style="margin-left: 0.5rem;">🌐 View All Listings</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="add-product">➕ Add Product</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.add_shop_owner_product') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Product Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="price">Price *</label>
+                            <input type="number" id="price" name="price" min="1" step="0.01" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="currency">Currency *</label>
+                            <select id="currency" name="currency" required>
+                                <option value="INR" selected>INR</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="NPR">NPR</option>
+                                <option value="AUD">AUD</option>
+                                <option value="CAD">CAD</option>
+                                <option value="JPY">JPY</option>
+                                <option value="AED">AED</option>
+                                <option value="SGD">SGD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="quality">Quality *</label>
+                            <select id="quality" name="quality" required>
+                                <option value="">Select quality</option>
+                                <option value="average">Average</option>
+                                <option value="good">Good</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="image">Product Image *</label>
+                            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Product</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" id="my-products">
+            <div class="card-header">📦 My Uploaded Products</div>
+            <div class="card-body">
+                {% if own_products %}
+                    <div class="shop-products-grid">
+                        {% for product in own_products %}
+                            <article class="shop-product-card">
+                                <img src="{{ url_for('static', filename='uploads/products/' ~ product.image_filename) }}" alt="{{ product.name }}" class="shop-product-image">
+                                <div class="shop-product-content">
+                                    <h4 style="margin: 0 0 0.4rem 0;">{{ product.name }}</h4>
+                                    <p style="margin: 0 0 0.5rem 0; color: #666;">{{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}</p>
+                                    <p style="margin: 0 0 0.5rem 0; font-weight: bold;">INR {{ '%.2f'|format(product.price) }}</p>
+                                    <span class="quality-pill quality-{{ product.quality|lower }}">{{ product.quality|title }}</span>
+                                    <form method="POST" action="{{ url_for('main.delete_shop_owner_product', product_id=product.id) }}" style="margin-top: 0.75rem;">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this product from all pages?');">Delete Product</button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No products uploaded by your shop yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card" id="all-products">
+            <div class="card-header">🌐 All Marketplace Listings</div>
+            <div class="card-body">
+                {% if products %}
+                    <div class="shop-products-grid">
+                        {% for product in products %}
+                            <article class="shop-product-card">
+                                <img src="{{ url_for('static', filename='uploads/products/' ~ product.image_filename) }}" alt="{{ product.name }}" class="shop-product-image">
+                                <div class="shop-product-content">
+                                    <h4 style="margin: 0 0 0.4rem 0;">{{ product.name }}</h4>
+                                    <p style="margin: 0 0 0.5rem 0; color: #666;">{{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}</p>
+                                    <p style="margin: 0 0 0.5rem 0; font-weight: bold;">INR {{ '%.2f'|format(product.price) }}</p>
+                                    <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #666;">
+                                        Seller:
+                                        {% if product.farmer %}
+                                            {% if 'shop_owner' in (product.farmer.user_type or '') and product.farmer.shop_name %}
+                                                {{ product.farmer.shop_name }}
+                                            {% else %}
+                                                {{ product.farmer.first_name or product.farmer.farm_name or 'Seller' }}
+                                            {% endif %}
+                                        {% else %}
+                                            Seller
+                                        {% endif %}
+                                    </p>
+                                    <span class="quality-pill quality-{{ product.quality|lower }}">{{ product.quality|title }}</span>
+                                    {% if product.farmer_id == user.id %}
+                                        <form method="POST" action="{{ url_for('main.delete_shop_owner_product', product_id=product.id) }}" style="margin-top: 0.75rem;">
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this product from all pages?');">Delete My Product</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No products available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
